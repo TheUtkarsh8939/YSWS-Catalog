@@ -1682,7 +1682,6 @@ setTimeout(() => {
   drawWheel();
 }, 2000);
 document.addEventListener("DOMContentLoaded", () => {
-    // Master pool containing all verified public CDN links
     const pool = [
       "https://cdn.hackclub.com/019ed762-ea08-7eb2-b8b4-0bc1c26c10d1/screenshot_2026-06-18_015147.png",
       "https://cdn.hackclub.com/019ed762-ed61-7e3f-a9af-6f2de6218eb8/screenshot_2026-06-18_022716.png",
@@ -1703,11 +1702,9 @@ document.addEventListener("DOMContentLoaded", () => {
       "https://cdn.hackclub.com/019ed763-2997-7e19-b75e-7f61ef8e9eb3/screenshot_2026-06-18_022907.png",
       "https://cdn.hackclub.com/019ed763-2c2b-7497-b860-849d0363f077/screenshot_2026-06-18_022828.png",
       "https://cdn.hackclub.com/019ed763-2fa6-70ff-a69a-c68949afdb54/screenshot_2026-06-18_022843.png",
-      
-      // --- New Upgraded CDN Links ---
       "https://cdn.hackclub.com/019ed787-f411-743c-b38e-dedce0fd33fe/dscf5717.jpg",
       "https://cdn.hackclub.com/019ed787-f850-7b33-b703-8e0b9e61c3e9/image.png",
-      "https://cdn.hackclub.com/019ed787-ff4c-785c-a620-0218e46c42b3/image.png",
+      "https://cdn.hackclub.com/019ed787-ff4c-785c-a680-0218e46c42b3/image.png",
       "https://cdn.hackclub.com/019ed788-02e5-7ca5-848e-d821a17cc9fa/image.png",
       "https://cdn.hackclub.com/019ed788-06da-7b13-a326-9dc427eb87c9/image.png",
       "https://cdn.hackclub.com/019ed788-0b3f-7acc-b254-ad935760c1dd/image.png",
@@ -1718,24 +1715,115 @@ document.addEventListener("DOMContentLoaded", () => {
       "https://cdn.hackclub.com/019ed789-5b83-7c6f-a96e-fe28076696f4/image.png"
     ];
 
-    // True Shuffle
+    // Fisher-Yates Shuffle 
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [pool[i], pool[j]] = [pool[j], pool[i]];
     }
 
-    // Set images up for the 6 premium frame elements
     const frames = document.querySelectorAll(".premium-polaroid");
+    
     frames.forEach((frame, idx) => {
       const img = frame.querySelector("img");
       if (img && pool[idx]) {
         img.src = pool[idx];
         
-        // Dynamic smooth tilts (-7deg to +7deg)
+        // Pick an authentic looking tilt (-7deg to +7deg)
         const randomRotate = Math.floor(Math.random() * 14) - 7;
         frame.style.setProperty('--init-tilt', `${randomRotate}deg`);
         
-        img.onload = () => frame.classList.add("visible");
+        img.onload = () => {
+          // Staggered dealing delays: 150ms step increments between card drops
+          setTimeout(() => {
+            frame.classList.add("visible");
+          }, idx * 150);
+        };
+
+        // --- NEW FEATURE: INTERACTIVE 3D MOUSE HULL MOTION ---
+        frame.addEventListener("mousemove", (e) => {
+          const rect = frame.getBoundingClientRect();
+          // Find localized offset coordinate percentages (-0.5 to +0.5)
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top) / rect.height - 0.5;
+          
+          // Calculate active 3D Matrix deformations
+          const tiltX = (y * -25).toFixed(2); // Maximum X pitch bounding
+          const tiltY = (x * 25).toFixed(2);  // Maximum Y yaw bounding
+          
+          frame.style.transform = `scale(1.15) rotateX(${tiltX}deg) rotateY(${tiltY}deg) rotateZ(0deg)`;
+        });
+
+        // Softly clear metrics when cursor leaves bounding box area
+        frame.addEventListener("mouseleave", () => {
+          frame.style.transform = `scale(1) rotateX(0deg) rotateY(0deg) rotateZ(var(--init-tilt, 0deg))`;
+        });
       }
     });
   });
+
+  document.addEventListener("DOMContentLoaded", () => {
+  const slider = document.getElementById("timeSlider");
+  const eraBadge = document.getElementById("eraBadge");
+  
+  // Official Hack Club Era Lore Configurations
+  const eras = {
+    2019: { name: "Ancient Era", color: "#6f42c1" }, 
+    2020: { name: "Ancient Era", color: "#6f42c1" },
+    2021: { name: "Sprig Era", color: "#38d9a9" },   
+    2022: { name: "Sprig Era", color: "#38d9a9" },
+    2023: { name: "OnBoard Era", color: "#fd7e14" },  
+    2024: { name: "High Seas Era", color: "#3b5bdb" }, 
+    2025: { name: "Current Era", color: "#ff4757" },  
+    2026: { name: "Current Era", color: "#ff4757" }
+  };
+
+  function updateTimeline(selectedYear) {
+    const currentEra = eras[selectedYear] || eras[2026];
+    
+    // Update Badge styling context
+    if (eraBadge) {
+      eraBadge.innerText = currentEra.name;
+      eraBadge.style.backgroundColor = currentEra.color;
+      eraBadge.style.boxShadow = `0 0 14px ${currentEra.color}aa`;
+    }
+
+    // Filter through generated card items (Ensure your generation scripts append data-year)
+    const cards = document.querySelectorAll(".program-card");
+    cards.forEach(card => {
+      const cardYear = parseInt(card.getAttribute("data-year")) || 2026;
+      
+      if (cardYear <= selectedYear) {
+        card.style.display = "block";
+        // Small timeout to allow the display property to process before animating scale
+        setTimeout(() => { 
+          card.style.opacity = "1"; 
+          card.style.transform = "scale(1)"; 
+        }, 20);
+      } else {
+        card.style.opacity = "0";
+        card.style.transform = "scale(0.93)";
+        setTimeout(() => { 
+          card.style.display = "none"; 
+        }, 250);
+      }
+    });
+  }
+
+  if (slider) {
+    slider.addEventListener("input", (e) => {
+      updateTimeline(parseInt(e.target.value));
+    });
+  }
+
+  // Window helper for the clickable text ticks below the track line
+  window.setSliderYear = function(year) {
+    if (slider) {
+      slider.value = year;
+      updateTimeline(year);
+    }
+  };
+  
+  // Set default timeline state
+  updateTimeline(2026);
+});
+

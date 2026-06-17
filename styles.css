@@ -6105,3 +6105,145 @@ footer {
   .hero-photos-container { display: none; } /* Kept safe and clean on phones */
 }
 
+/* Enable 3D arena context for the workspace container */
+.hero-photos-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  perspective: 1200px; /* Crucial for the 3D hover physics */
+}
+
+/* Elite Polaroid Base with Dealing Physics */
+.premium-polaroid {
+  position: absolute;
+  background: #fdfdfd;
+  padding: 12px 12px 34px 12px;
+  border-radius: 4px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  width: 195px;
+  pointer-events: auto;
+  
+  /* Initial State before deal: Hidden and slightly thrown down off-center */
+  opacity: 0;
+  transform: translate3d(0, 40px, -100px) rotate(0deg);
+  
+  /* Smooth transitions for interactive mouse tracking */
+  transition: 
+    transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1.1), 
+    box-shadow 0.3s ease, 
+    opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Injected by JS once loaded: triggers the dramatic toss onto the desk */
+.premium-polaroid.visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) rotate(var(--init-tilt, 0deg));
+}
+
+/* Custom individual drift floats so they move independently on the desk */
+.premium-polaroid.p1.visible { animation: slowFloatY 7s ease-in-out infinite alternate; }
+.premium-polaroid.p2.visible { animation: slowFloatX 6s ease-in-out infinite alternate 0.5s; }
+.premium-polaroid.p3.visible { animation: slowFloatY 8s ease-in-out infinite alternate 1s; }
+.premium-polaroid.p4.visible { animation: slowFloatX 7.5s ease-in-out infinite alternate 0.2s; }
+.premium-polaroid.p5.visible { animation: slowFloatY 6.5s ease-in-out infinite alternate 0.7s; }
+.premium-polaroid.p6.visible { animation: slowFloatX 8.5s ease-in-out infinite alternate 1.2s; }
+
+.premium-polaroid .img-wrapper {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #181717;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.premium-polaroid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+
+/* Premium Dynamic Interactive State */
+.premium-polaroid:hover {
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.65);
+  z-index: 999 !important; /* Always lift completely above surrounding UI */
+  animation-play-state: paused !important; /* Stop independent drifting while interacting */
+}
+
+/* Ambient organic drifting vectors */
+@keyframes slowFloatY {
+  0% { transform: translate3d(0, 0px, 0) rotate(var(--init-tilt, 0deg)); }
+  100% { transform: translate3d(0, -10px, 0) rotate(var(--init-tilt, 0deg)); }
+}
+@keyframes slowFloatX {
+  0% { transform: translate3d(0px, 0, 0) rotate(var(--init-tilt, 0deg)); }
+  100% { transform: translate3d(-8px, 0, 0) rotate(var(--init-tilt, 0deg)); }
+}
+
+/* Layout Slots staying far clear of your central workspace text */
+.premium-polaroid.p1 { top: 6%; left: 3%; }
+.premium-polaroid.p2 { top: 40%; left: 2%; }
+.premium-polaroid.p3 { bottom: 8%; left: 4%; }
+.premium-polaroid.p4 { top: 6%; right: 3%; }
+.premium-polaroid.p5 { top: 40%; right: 4%; }
+.premium-polaroid.p6 { bottom: 8%; right: 3%; }
+
+@media (max-width: 1200px) {
+  .premium-polaroid { width: 155px; padding: 10px 10px 24px 10px; }
+}
+@media (max-width: 880px) {
+  .hero-photos-container { display: none; }
+}
+
+/* Premium Master Section Headings (Limited Time, Draft, Indefinite) */
+.program-section-title, 
+h2.section-heading, /* Adjust if you use a different class/tag */
+.hero-section + div h2 { 
+  font-family: 'Phantom Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 2rem;            /* Prominent desktop sizing */
+  font-weight: 880;            /* Heavy, aggressive bold profile */
+  color: #ffffff;             /* Piercing high-contrast white */
+  letter-spacing: -0.03em;    /* Tight, professional display tracking */
+  line-height: 1.1;
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-transform: none;       /* Retains elegant natural capitalization casing */
+}
+
+/* Tactical Left Accent Indicator Bar */
+.program-section-title::before,
+h2.section-heading::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 1.5rem;
+  background: #ff4757;        /* Flagship vibrant Hack Club red */
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
+}
+
+/* Subtle underlying separator anchor to organize dashboard density */
+.program-section-divider {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%);
+  margin-bottom: 2rem;
+}
+
+/* Responsive Scaling for Small Displays */
+@media (max-width: 768px) {
+  .program-section-title, h2.section-heading {
+    font-size: 1.6rem;
+  }
+  .program-section-title::before, h2.section-heading::before {
+    height: 1.2rem;
+    width: 4px;
+  }
+}
